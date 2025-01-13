@@ -32,18 +32,7 @@ class IPCheckService {
 	 */
 	public function init() {
 		add_action( 'wp_ajax_wpbr_check_ip', array( $this, 'check_ip_handler' ) );
-		add_filter( 'woocommerce_get_settings_pages', array( $this, 'add_settings_page' ) );
-	}
-
-	/**
-	 * Add settings page to WooCommerce settings
-	 *
-	 * @param array $settings Array of WC_Settings_Page classes.
-	 * @return array
-	 */
-	public function add_settings_page( $settings ) {
-		$settings[] = IPCheckSettings::get_instance();
-		return $settings;
+		IPCheckSettings::get_instance();
 	}
 
 	/**
@@ -144,20 +133,5 @@ class IPCheckService {
 		update_option( 'wpbr_ip_check', $ip_data );
 
 		wp_send_json_success( $ip_data );
-	}
-
-	/**
-	 * Get the stored IP check data
-	 *
-	 * @return array
-	 */
-	private function get_stored_ip_data() {
-		$default = array(
-			'ip'           => '',
-			'version'      => '',
-			'checked_time' => '',
-		);
-
-		return get_option( 'wpbr_ip_check', $default );
 	}
 } 
