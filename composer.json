@@ -1,0 +1,20 @@
+{
+    "name": "wpbrewer/wpbr-ip-check",
+    "description": "WPBrewer IP Check is a simple IP check tool that can verify the actual IP when the website calls external services.",
+    "type": "wordpress-plugin",
+    "license": "GPL-2.0-or-later",
+    "authors": [
+        {
+            "name": "WPBrewer",
+            "homepage": "https://wpbrewer.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "WPBrewer\\IPCheck\\": "src/"
+        }
+    }
+} 
