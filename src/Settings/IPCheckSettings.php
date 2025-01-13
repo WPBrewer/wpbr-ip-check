@@ -45,17 +45,6 @@ class IPCheckSettings extends \WC_Settings_Page {
 				'id'    => 'wpbr_ip_check_section',
 			),
 			array(
-				'title'    => __( 'HTTP Client', 'wpbr-ip-check' ),
-				'type'     => 'radio',
-				'desc'     => __( 'Select which HTTP client to use for IP checking', 'wpbr-ip-check' ),
-				'id'       => 'wpbr_http_client',
-				'options'  => array(
-					'wp_remote_get' => __( 'WordPress HTTP API (wp_remote_get)', 'wpbr-ip-check' ),
-					'curl'          => __( 'cURL', 'wpbr-ip-check' ),
-				),
-				'default'  => 'wp_remote_get',
-			),
-			array(
 				'title'       => __( 'Force IPv4', 'wpbr-ip-check' ),
 				'type'        => 'checkbox',
 				'desc'        => __( 'Force using IPv4 when checking IP address', 'wpbr-ip-check' ),
