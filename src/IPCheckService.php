@@ -52,28 +52,52 @@ class IPCheckService {
 	 * @return array
 	 */
 	public function get_current_ip() {
-		$args = array();
+		$http_client = get_option( 'wpbr_http_client', 'wp_remote_get' );
+		$force_ipv4 = 'yes' === get_option( 'wpbr_force_ipv4', 'no' );
 		
-		// Force IPv4 if enabled in settings
-		if ( 'yes' === get_option( 'wpbr_force_ipv4', 'no' ) ) {
-			//force curl to use ipv4
-			add_action( 'http_api_curl', function( $handle, $r, $url ) {
-				curl_setopt( $handle, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4 );
-			}, 10, 3);
+		if ( 'curl' === $http_client ) {
+			$ch = curl_init();
+			curl_setopt( $ch, CURLOPT_URL, $this->api_endpoint );
+			curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
+			
+			if ( $force_ipv4 ) {
+				curl_setopt( $ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4 );
+			}
+			
+			$response = curl_exec( $ch );
+			$error = curl_error( $ch );
+			curl_close( $ch );
+			
+			if ( false === $response ) {
+				return array(
+					'success' => false,
+					'ip'      => '0.0.0.0',
+					'error'   => $error,
+				);
+			}
+			
+			$data = json_decode( $response, true );
+		} else {
+			$args = array();
+			
+			if ( $force_ipv4 ) {
+				add_action( 'http_api_curl', function( $handle ) {
+					curl_setopt( $handle, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4 );
+				}, 10, 1 );
+			}
+			
+			$response = wp_remote_get( $this->api_endpoint, $args );
+			
+			if ( is_wp_error( $response ) ) {
+				return array(
+					'success' => false,
+					'ip'      => '0.0.0.0',
+					'error'   => $response->get_error_message(),
+				);
+			}
+			
+			$data = json_decode( wp_remote_retrieve_body( $response ), true );
 		}
-
-		$response = wp_remote_get( $this->api_endpoint, $args );
-
-		if ( is_wp_error( $response ) ) {
-			return array(
-				'success' => false,
-				'ip'      => '0.0.0.0',
-				'error'   => $response->get_error_message(),
-			);
-		}
-
-		$body = wp_remote_retrieve_body( $response );
-		$data = json_decode( $body, true );
 
 		if ( empty( $data['ip'] ) ) {
 			return array(
